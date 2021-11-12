@@ -12,9 +12,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
-import {
-  createUserWithEmailAndPassword
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../helpers/firebase.config";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -36,16 +34,13 @@ export default function SignUp(props) {
     setConfirmPassword(event.target.value);
   };
 
-
   const register = async () => {
     try {
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      await createUserWithEmailAndPassword(auth, email, password);
       toast.success("User Registered Successfully");
-      setTimeout(function(){ props.toggle(); }, 5000);
+      setTimeout(function () {
+        props.toggle();
+      }, 5000);
     } catch (error) {
       switch (error.code) {
         case "The email is already used!":

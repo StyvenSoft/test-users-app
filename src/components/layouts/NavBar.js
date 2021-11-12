@@ -6,25 +6,23 @@ import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Typography } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 
-export default function NavBar() {
-  const [auth, setAuth] = React.useState(true);
+
+export default function NavBar(props) {
+  const [auth, ] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
 
-  const handleChange = (event) => {
-    setAuth(event.target.checked);
-  };
+  const handleClose = () => {
+    localStorage.removeItem('user');
+    props.setUserState();
+    setAnchorEl(null);
+}
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
   };
 
   return (
@@ -45,9 +43,6 @@ export default function NavBar() {
           </Typography>
           {auth && (
             <div>
-              <Button color="inherit" startIcon={<AddIcon />}>
-                Add new
-              </Button>
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -70,10 +65,10 @@ export default function NavBar() {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={Boolean(anchorEl)}
+                open={open}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose} onChange={handleChange}>Logout</MenuItem>
+                <MenuItem onClick={handleClose}>Logout</MenuItem>
               </Menu>
             </div>
           )}

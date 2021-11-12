@@ -12,12 +12,17 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../helpers/firebase.config";
+import { ToastContainer, toast } from "react-toastify";
+import { BeatLoader } from "react-spinners";
 
 const theme = createTheme();
 
 export default function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -27,13 +32,38 @@ export default function Login(props) {
     setPassword(event.target.value);
   };
 
-  const handlerLogin = () => {};
+  const login = async () => {
+    setLoading(true);
+    await signInWithEmailAndPassword(auth, email, password)
+      .then((response) => {
+        const { user } = response;
+        const data = {
+          userId: user.uid,
+          email: user.email,
+        };
+        localStorage.setItem("user", JSON.stringify(data));
+        const storage = localStorage.getItem("user");
+        const loggedInUser = storage !== null ? JSON.parse(storage) : null;
+        props.loggedIn(loggedInUser);
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        setLoading(false);
+      });
+  };
+  const override = `
+        display: block;
+        margin: 2rem auto;
+        border-color: red;
+    `;
 
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <Card sx={{ minWidth: 275 }} style={{ marginTop: "2rem" }}>
           <CardContent>
+            <ToastContainer />
             <CssBaseline />
             <Box
               sx={{
@@ -50,7 +80,7 @@ export default function Login(props) {
                 Sign in
               </Typography>
               <ValidatorForm
-                onSubmit={handlerLogin}
+                onSubmit={login}
                 onError={(errors) => {
                   for (const err of errors) {
                     console.log(err.props.errorMessages[0]);
@@ -85,14 +115,18 @@ export default function Login(props) {
                   errorMessages={["this field is required"]}
                   autoComplete="off"
                 />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Sign In
-                </Button>
+                {loading ? (
+                  <BeatLoader css={override} loading={loading} />
+                ) : (
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Sign In
+                  </Button>
+                )}
                 <Grid container>
                   <Grid item>
                     <Link onClick={props.toggle} href="#" variant="body2">
